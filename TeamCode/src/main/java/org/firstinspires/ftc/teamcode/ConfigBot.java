@@ -7,11 +7,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 @TeleOp(name = "Testing Config", group = "cool stuff")
 public class ConfigBot extends LinearOpMode{
     public void runOpMode() throws InterruptedException{
+
         DcMotor LFMotor = hardwareMap.dcMotor.get("LFMotor");
         DcMotor LBMotor = hardwareMap.dcMotor.get("LBMotor");
         DcMotor RFMotor = hardwareMap.dcMotor.get("RFMotor");
         DcMotor RBMotor = hardwareMap.dcMotor.get("RBMotor");
-
         DcMotor Intake = hardwareMap.dcMotor.get("Intake");
 
     waitForStart();
@@ -42,7 +42,6 @@ public class ConfigBot extends LinearOpMode{
             RBMotor.setPower(0.5);
         else
             RBMotor.setPower(0);
-
 
 
         if (gamepad1.b)

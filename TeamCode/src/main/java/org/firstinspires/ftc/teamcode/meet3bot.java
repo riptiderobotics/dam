@@ -4,23 +4,27 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-@TeleOp(name = "Drive stuff around...")
-public class PlayingAroundWMeet3 extends LinearOpMode {
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
+@TeleOp(name = "drive!")
+public class meet3bot extends LinearOpMode {
     @Override
+
     public void runOpMode() throws InterruptedException {
         // Declare our motors
         // Make sure your ID's match your configuration
-        DcMotor frontLeftMotor = hardwareMap.dcMotor.get("LFMotor");
-        DcMotor backLeftMotor = hardwareMap.dcMotor.get("LBMotor");
-        DcMotor frontRightMotor = hardwareMap.dcMotor.get("RFMotor");
-        DcMotor backRightMotor = hardwareMap.dcMotor.get("RBMotor");
+        DcMotorEx frontLeftMotor = hardwareMap.get(DcMotorEx.class, "LFMotor");
+        DcMotorEx backLeftMotor = hardwareMap.get(DcMotorEx.class, "LBMotor");
+        DcMotorEx frontRightMotor = hardwareMap.get(DcMotorEx.class, "RFMotor");
+        DcMotorEx backRightMotor = hardwareMap.get(DcMotorEx.class, "RBMotor");
+
 
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead.
         // See the note about this earlier on this page.
-        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
@@ -41,20 +45,14 @@ public class PlayingAroundWMeet3 extends LinearOpMode {
             double frontRightPower = (y - x - rx) / denominator;
             double backRightPower = (y + x - rx) / denominator;
 
-
-
             frontLeftMotor.setPower(frontLeftPower);
             backLeftMotor.setPower(backLeftPower);
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
             telemetry.addData("y:", gamepad1.left_stick_y);
             telemetry.addData("x:", gamepad1.left_stick_x);
-            telemetry.addData("x:", gamepad1.left_stick_x);
-
-            telemetry.addData("FL:", frontLeftPower);
-            telemetry.addData("BL:", backLeftPower);
-            telemetry.addData("FR:", frontRightPower);
-            telemetry.addData("BR:", backRightPower);
+            telemetry.addData("x2:", gamepad1.right_stick_x);
+            telemetry.addData("getCurrent", frontLeftMotor.getCurrent(CurrentUnit.AMPS));
             telemetry.update();
         }
     }

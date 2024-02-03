@@ -10,7 +10,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class NewMechanumDrive  extends LinearOpMode{
 
-
     @Override
     public void runOpMode() throws InterruptedException {
         DcMotor RFMotor = hardwareMap.dcMotor.get("RFMotor");
