@@ -6,10 +6,13 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -33,7 +36,13 @@ public class MecanumDrive2 extends LinearOpMode {
         DROP
     }
 
+    public enum IntakeStates{
+        START,
+        INTAKING,
+        FINISH
+    }
     OuttakeStates outtakeStates = OuttakeStates.START;
+    IntakeStates intakeStates = IntakeStates.START;
     public void runOpMode() throws InterruptedException {
 
         boolean targetFound = false;
@@ -51,13 +60,13 @@ public class MecanumDrive2 extends LinearOpMode {
         DcMotor RBMotor = hardwareMap.dcMotor.get("RBMotor");
         DcMotor LFMotor = hardwareMap.dcMotor.get("LFMotor");
         DcMotor LBMotor = hardwareMap.dcMotor.get("LBMotor");
-        DcMotor IntakeMotor = hardwareMap.dcMotor.get("Intake");
+        DcMotorEx IntakeMotor = hardwareMap.get(DcMotorEx.class, "Intake");
         //Pixel Holder Servo
         Servo outtakeServo1 = hardwareMap.servo.get("Outake1");
         DcMotor SpoolMotor = hardwareMap.dcMotor.get("Spool");
         //Outake Swiweler Servo
         Servo OutakeServo2 = hardwareMap.servo.get("Outake2");
-
+        double tracker = hardwareMap.voltageSensor.iterator().next().getVoltage();
         //Initialize servos to required position
         outtakeServo1.setPosition(1);
         OutakeServo2.setPosition(1);
@@ -102,6 +111,28 @@ public class MecanumDrive2 extends LinearOpMode {
                         outtakeStates = OuttakeStates.START;
                     }
                     break;
+            }
+            switch (intakeStates){
+                case START:
+                    if(gamepad2.a){
+                        IntakeMotor.setPower(0.5);
+                        intakeStates = IntakeStates.INTAKING;
+                    }
+                    break;
+                case INTAKING:
+                    //Need to tune the current value
+                    if(IntakeMotor.getCurrent(CurrentUnit.AMPS) > 2){
+                        sleep(500);
+                        intakeStates = IntakeStates.FINISH;
+                    }
+                    break;
+                case FINISH:
+                    if(IntakeMotor.getCurrent(CurrentUnit.AMPS) < 2 && IntakeMotor.getCurrent(CurrentUnit.AMPS) > 1){
+                        IntakeMotor.setPower(0);
+                        intakeStates = IntakeStates.START;
+                    }
+                    break;
+
             }
 
             List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
