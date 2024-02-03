@@ -27,6 +27,13 @@ public class MecanumDrive2 extends LinearOpMode {
     private AprilTagProcessor aprilTagProcessor;              // Used for managing the AprilTag detection process.
     private AprilTagDetection desiredTag = null;
     private AprilTagProcessor.Builder aprilTagProcessorBuilder;
+    public enum OuttakeStates{
+        START,
+        DEPOSIT_SETUP,
+        DROP
+    }
+
+    OuttakeStates outtakeStates = OuttakeStates.START;
     public void runOpMode() throws InterruptedException {
 
         boolean targetFound = false;
@@ -44,11 +51,16 @@ public class MecanumDrive2 extends LinearOpMode {
         DcMotor RBMotor = hardwareMap.dcMotor.get("RBMotor");
         DcMotor LFMotor = hardwareMap.dcMotor.get("LFMotor");
         DcMotor LBMotor = hardwareMap.dcMotor.get("LBMotor");
-        DcMotor IntakeMotor = hardwareMap.dcMotor.get("IntakeMotor");
+        DcMotor IntakeMotor = hardwareMap.dcMotor.get("Intake");
+        //Pixel Holder Servo
+        Servo outtakeServo1 = hardwareMap.servo.get("Outake1");
         DcMotor SpoolMotor = hardwareMap.dcMotor.get("Spool");
-        Servo Outake = hardwareMap.servo.get("Outake");
+        //Outake Swiweler Servo
+        Servo OutakeServo2 = hardwareMap.servo.get("Outake2");
 
-        Outake.setPosition(1);
+        //Initialize servos to required position
+        outtakeServo1.setPosition(1);
+        OutakeServo2.setPosition(1);
         RFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         RBMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         LFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -62,6 +74,35 @@ public class MecanumDrive2 extends LinearOpMode {
         double offset = 0;
         waitForStart();
         while (opModeIsActive()) {
+
+            switch (outtakeStates){
+                //START case is the inital case, where the outake hasn't sprung out
+                case START:
+                    if(gamepad2.x){
+                        OutakeServo2.setPosition(0);
+                        outtakeStates = OuttakeStates.DEPOSIT_SETUP;
+                    }
+                    break;
+                    //DEPOSIT_SETUP is second state where the outake gets ready to drop the pixel
+                case DEPOSIT_SETUP:
+                    if(gamepad2.x){
+                        outtakeServo1.setPosition(0);
+                        outtakeStates = OuttakeStates.DROP;
+                    }
+                    if(gamepad2.y){
+                        OutakeServo2.setPosition(1);
+                        outtakeStates = OuttakeStates.START;
+                    }
+                    break;
+                    //DROP is the final state where the pixel is dropped
+                case DROP:
+                    if(gamepad2.x){
+                        outtakeServo1.setPosition(1);
+                        OutakeServo2.setPosition(1);
+                        outtakeStates = OuttakeStates.START;
+                    }
+                    break;
+            }
 
             List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
             for (AprilTagDetection detection : currentDetections) {
@@ -125,11 +166,7 @@ public class MecanumDrive2 extends LinearOpMode {
             }
 
             //Servo positioning
-            if (gamepad2.a) {
-                Outake.setPosition(1);
-            } else if (gamepad2.b) {
-                Outake.setPosition(0.8);
-            }
+
 
 
             double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
