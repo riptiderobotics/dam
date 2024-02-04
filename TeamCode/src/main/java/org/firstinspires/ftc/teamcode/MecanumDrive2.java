@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -56,7 +57,7 @@ public class MecanumDrive2 extends LinearOpMode {
         telemetry.addData("Camera preview on/off", "3 dots, Camera Stream");
         telemetry.update();
 
-        DcMotor RFMotor = hardwareMap.dcMotor.get("RFMotor");
+        /*DcMotor RFMotor = hardwareMap.dcMotor.get("RFMotor");
         DcMotor RBMotor = hardwareMap.dcMotor.get("RBMotor");
         DcMotor LFMotor = hardwareMap.dcMotor.get("LFMotor");
         DcMotor LBMotor = hardwareMap.dcMotor.get("LBMotor");
@@ -72,7 +73,7 @@ public class MecanumDrive2 extends LinearOpMode {
         OutakeServo2.setPosition(1);
         RFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         RBMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        LFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        LFMotor.setDirection(DcMotorSimple.Direction.REVERSE);*/
 
         BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -84,7 +85,7 @@ public class MecanumDrive2 extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            switch (outtakeStates){
+            /*switch (outtakeStates){
                 //START case is the inital case, where the outake hasn't sprung out
                 case START:
                     if(gamepad2.x){
@@ -133,19 +134,23 @@ public class MecanumDrive2 extends LinearOpMode {
                     }
                     break;
 
-            }
+            }*/
+
+            targetFound = false;
+            desiredTag  = null;
 
             List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
             for (AprilTagDetection detection : currentDetections) {
-                for(int i = 1; i <= 3; i++){
-                    if(detection.metadata != null && (detection.id == i)){
-                        targetFound = true;
-                        DESIRED_TAG_ID = i;
-                        break;
-                    }
-                    else
-                        DESIRED_TAG_ID = -1;
+
+                if ( (detection.id == DESIRED_TAG_ID)) {
+                    // Yes, we want to use this tag.
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
                 }
+                else
+                    DESIRED_TAG_ID = -1;
+
                 if (DESIRED_TAG_ID < 0){
                     targetFound = false; // don't look any further.
                     telemetry.addData("Unknown Target", "Tag ID %d is not in TagLibrary\n", detection.id);
@@ -156,8 +161,9 @@ public class MecanumDrive2 extends LinearOpMode {
             // Tell the driver what we see, and what to do.
             if (targetFound) {
                 telemetry.addData("Target", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-                telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
-                telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
+                telemetry.addData("x",  "%5.1f inches", desiredTag.ftcPose.x);
+                telemetry.addData("y","%3.0f inches", desiredTag.ftcPose.y);
+                telemetry.addData("z","%3.0f inches", desiredTag.ftcPose.z);
 
             } else {
                 telemetry.addData(">","Drive using joysticks to find valid target\n");
@@ -179,22 +185,10 @@ public class MecanumDrive2 extends LinearOpMode {
             double rotY = x * Math.sin(botHeading - offset) + y * Math.cos(botHeading - offset);
 
             //Powering intake on or off
-            if (gamepad2.dpad_up) {
-                IntakeMotor.setPower(1);
-            } else if (gamepad2.dpad_down) {
-                IntakeMotor.setPower(-1);
-            } else {
-                IntakeMotor.setPower(0);
-            }
+
 
             //Powering slides on/off
-            if (gamepad2.x) {
-                SpoolMotor.setPower(0.5);
-            } else if (gamepad2.y) {
-                SpoolMotor.setPower(-0.5);
-            } else {
-                SpoolMotor.setPower(0);
-            }
+
 
             //Servo positioning
 
@@ -206,10 +200,10 @@ public class MecanumDrive2 extends LinearOpMode {
             double frontRightPower = (rotY - rotX - rx) / denominator;
             double backRightPower = (rotY + rotX - rx) / denominator;
 
-            LFMotor.setPower(frontLeftPower);
+            /*LFMotor.setPower(frontLeftPower);
             LBMotor.setPower(backLeftPower);
             RFMotor.setPower(frontRightPower);
-            RBMotor.setPower(backRightPower);
+            RBMotor.setPower(backRightPower);*/
             telemetry.addData("y speed:", y);
             telemetry.addData("x speed:", x);
             telemetry.update();
@@ -217,30 +211,16 @@ public class MecanumDrive2 extends LinearOpMode {
     }
 
     public void initCamera(){
-        aprilTagProcessorBuilder = new AprilTagProcessor.Builder();
-        aprilTagProcessorBuilder.setLensIntrinsics(578.272, 578.272, 402.145, 221.506);
 
-        aprilTagProcessorBuilder.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11);
-        aprilTagProcessorBuilder.setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary());
 
-        aprilTagProcessorBuilder.setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES);
-
-        aprilTagProcessorBuilder.setNumThreads(3);
-
-        aprilTagProcessorBuilder.setDrawTagID(true);
-        aprilTagProcessorBuilder.setDrawTagOutline(true);
-        aprilTagProcessorBuilder.setDrawAxes(true);
-        aprilTagProcessorBuilder.setDrawCubeProjection(true);
-
-        aprilTagProcessor = aprilTagProcessorBuilder.build();
+        aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
+        visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTagProcessor);
     }
 
     private void setManualExposure(int exposureMS, int gain) {
         // Wait for the camera to be open, then use the controls
 
-        if (visionPortal == null) {
-            return;
-        }
+
 
         // Make sure camera is streaming before we try to set the exposure controls
         if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
