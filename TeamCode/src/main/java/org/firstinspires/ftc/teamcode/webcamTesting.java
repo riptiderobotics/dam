@@ -4,11 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.VisionPipelines.ActuallyContourPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -17,10 +18,12 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 @Autonomous(name = "webcam testing!")
 public class webcamTesting extends LinearOpMode {
-    DcMotor RFMotor = hardwareMap.dcMotor.get("RFMotor");
     DcMotor RBMotor = hardwareMap.dcMotor.get("RBMotor");
     DcMotor LFMotor = hardwareMap.dcMotor.get("LFMotor");
     DcMotor LBMotor = hardwareMap.dcMotor.get("LBMotor");
+
+    DcMotorEx RFMotor = hardwareMap.get(DcMotorEx.class, "RFMotor");
+
 
 
     // why does Android studio have a spell checker
