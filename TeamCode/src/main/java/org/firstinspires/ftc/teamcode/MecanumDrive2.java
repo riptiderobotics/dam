@@ -19,6 +19,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.teamcode.PIDLoop;
 
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class MecanumDrive2 extends LinearOpMode {
     }
     OuttakeStates outtakeStates = OuttakeStates.START;
     IntakeStates intakeStates = IntakeStates.START;
+    PIDLoop outakeSlides = new PIDLoop(0, 0, 0);
     public void runOpMode() throws InterruptedException {
 
         boolean targetFound = false;
@@ -74,6 +76,7 @@ public class MecanumDrive2 extends LinearOpMode {
         RFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         RBMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         LFMotor.setDirection(DcMotorSimple.Direction.REVERSE);*/
+        DcMotorEx outakeSlideMotor = hardwareMap.get(DcMotorEx.class, "outakeSlides");
 
         BNO055IMU imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -85,6 +88,12 @@ public class MecanumDrive2 extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
+            //test
+            outakeSlideMotor.setPower(0);
+            if(gamepad1.x){
+                double power = outakeSlides.PIDControl(100, outakeSlideMotor.getCurrentPosition());
+                outakeSlideMotor.setPower(power);
+            }
             /*switch (outtakeStates){
                 //START case is the inital case, where the outake hasn't sprung out
                 case START:
@@ -125,6 +134,7 @@ public class MecanumDrive2 extends LinearOpMode {
                     if(IntakeMotor.getCurrent(CurrentUnit.AMPS) > 2){
                         sleep(500);
                         intakeStates = IntakeStates.FINISH;
+                        telemetry.addData("")
                     }
                     break;
                 case FINISH:
@@ -154,7 +164,7 @@ public class MecanumDrive2 extends LinearOpMode {
                 if (DESIRED_TAG_ID < 0){
                     targetFound = false; // don't look any further.
                     telemetry.addData("Unknown Target", "Tag ID %d is not in TagLibrary\n", detection.id);
-                } else {
+
                     break;
                 }
             }
