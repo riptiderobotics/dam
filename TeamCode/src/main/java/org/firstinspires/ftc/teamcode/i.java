@@ -5,27 +5,17 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.teamcode.PIDLoop;
 
 import java.util.List;
 
 @TeleOp(name = "Camera Test", group = "linear opmode")
-public class MecanumDrive2 extends LinearOpMode {
-
+public class i extends LinearOpMode {
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private static int DESIRED_TAG_ID = 1;     // Choose the tag you want to approach or set to -1 for ANY tag.
     private VisionPortal visionPortal;               // Used to manage the video source.
@@ -178,6 +168,9 @@ public class MecanumDrive2 extends LinearOpMode {
             } else {
                 telemetry.addData(">","Drive using joysticks to find valid target\n");
             }
+
+
+
 
             double botHeading = -imu.getAngularOrientation().firstAngle;
             if (gamepad1.a) {

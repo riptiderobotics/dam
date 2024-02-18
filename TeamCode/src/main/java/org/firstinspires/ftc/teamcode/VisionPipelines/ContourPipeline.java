@@ -9,6 +9,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
@@ -86,14 +87,17 @@ public class ContourPipeline extends OpenCvPipeline {
 
         Rect[] boundRect = new Rect[contours.size()];
         //Might be useful later, idk so I am going to leave this here
-        //Point[] centers = new Point[contours.size()];
-
+        Point[] centers = new Point[contours.size()];
 
         for (int i = 0; i < contours.size(); i++) {
             contoursPoly[i] = new MatOfPoint2f();
             Imgproc.approxPolyDP(new MatOfPoint2f(contours.get(i).toArray()), contoursPoly[i], 3, true);
             boundRect[i] = Imgproc.boundingRect(contours.get(i));
-            //centers[i] = new Point();
+            Moments p = Imgproc.moments(contours.get(i), false);
+            int x = (int) (p.get_m10() / p.get_m00());
+            int y = (int) (p.get_m01() / p.get_m00());
+            centers[i] = new Point(x,y);
+
         }
 
 
@@ -108,7 +112,7 @@ public class ContourPipeline extends OpenCvPipeline {
             contoursPolyList.add(new MatOfPoint(poly.toArray()));
         }
 
-
+        Core.subtract(maskedInputMat,maskedInputMat, emptyMat);
         // now this can be removed during the meet.
         if (onlyContours == 1)
         {
@@ -160,7 +164,8 @@ public class ContourPipeline extends OpenCvPipeline {
                     2                                                                      // Thickness
             );
             Imgproc.drawContours(activeMat, contoursPolyList, index, contourColors, contourSize);
-            Imgproc.rectangle(activeMat, boundRect[index].tl(), boundRect[index].br(), contourColors, 2);
+            Imgproc.rectangle(activeMat, boundRect[index].tl(), boundRect[index].br(), contourColors, 1);
+            Imgproc.circle(activeMat, centers[index], 1, contourColors);
         }
 
         return activeMat;
