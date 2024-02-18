@@ -9,8 +9,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 @Autonomous(name = "encoder testing for roadrunner")
 public class encoderTesting extends LinearOpMode
 {
-
-    // People wired the robot bad so don't mind the inconsistent telemetry/variable names.
     DcMotor RFMotor;
     DcMotor RBMotor;
 
@@ -55,7 +53,7 @@ public class encoderTesting extends LinearOpMode
         RFMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         // Left pod deadwheel
         LFMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        // Center pod deadwheel
+        // center pod deadwheel
         LBMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
@@ -67,8 +65,6 @@ public class encoderTesting extends LinearOpMode
 
         while( opModeIsActive())
         {
-            //Left pod is right pod
-            //Center pod is left pod
             rightPodPastPos = rightPodCurrPos;
 
             leftPodPastPos = leftPodCurrPos;
@@ -77,13 +73,13 @@ public class encoderTesting extends LinearOpMode
 
             sleep(3000);
             leftPodCurrPos = RFMotor.getCurrentPosition();
-            centerPodCurrPos = LFMotor.getCurrentPosition();
-            rightPodCurrPos = LBMotor.getCurrentPosition();
+            centerPodCurrPos = RFMotor.getCurrentPosition();
+            rightPodCurrPos = RFMotor.getCurrentPosition();
             sleep(3000);
 
-            telemetry.addData("CenterPod positivity, value", positivity(rightPodCurrPos, rightPodPastPos) + ", " + rightPodCurrPos);
-            telemetry.addData("RightPod positivity, value", positivity(leftPodCurrPos, leftPodPastPos) + ", " + leftPodCurrPos);
-            telemetry.addData("LeftPod positivity, value", positivity(centerPodCurrPos, centerPodCurrPos) + ", " + centerPodCurrPos);
+            telemetry.addData("RightPod positivity, value", positivity(rightPodCurrPos, rightPodPastPos) + ", " + rightPodCurrPos);
+            telemetry.addData("LeftPod positivity, value", positivity(leftPodCurrPos, leftPodPastPos) + ", " + leftPodCurrPos);
+            telemetry.addData("CenterPod positivity, value", positivity(centerPodCurrPos, rightPodPastPos) + ", " + rightPodCurrPos);
             telemetry.update();
         }
         
