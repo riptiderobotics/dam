@@ -169,7 +169,7 @@ public class FSMTest extends LinearOpMode{
                     break;
                 case DROPSLIDES:
                     if(Math.abs(slides.getCurrentPosition()) >= 10)
-                        slides.setPower(-0.4);
+                        slides.setPower(0.2);
                     else
                         slides.setPower(-0.2);
                     if(gamepad2.b)
@@ -269,14 +269,14 @@ public class FSMTest extends LinearOpMode{
             if(gamepad2.dpad_up)
             {
                 //slides.setTargetPosition(slides.getCurrentPosition() + 50);
-                slides.setPower(1);
+                slides.setPower(-0.95);
             }
             else if(gamepad2.dpad_down)
             {
-                slides.setPower(-0.2);
+                slides.setPower(0.2);
             }
             else {
-                slides.setPower(0.2);
+                slides.setPower(-0.2);
             }
 
             if(gamepad1.dpad_up)
