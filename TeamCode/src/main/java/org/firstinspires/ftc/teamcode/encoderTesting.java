@@ -59,16 +59,17 @@ public class encoderTesting extends LinearOpMode
 
 
 
-        rightPodPastPos = rightPodCurrPos;
 
-        leftPodPastPos = leftPodCurrPos;
-
-        centerPodPastPos = centerPodCurrPos;
 
         waitForStart();
 
         while( opModeIsActive())
         {
+            rightPodPastPos = rightPodCurrPos;
+
+            leftPodPastPos = leftPodCurrPos;
+
+            centerPodPastPos = centerPodCurrPos;
             RFMotor.setPower(0.3);
             LFMotor.setPower(0.3);
             RBMotor.setPower(0.3);
