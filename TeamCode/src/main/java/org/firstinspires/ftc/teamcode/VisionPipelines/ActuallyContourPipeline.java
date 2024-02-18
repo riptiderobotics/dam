@@ -23,7 +23,7 @@ import java.util.List;
 public class ActuallyContourPipeline extends OpenCvPipeline {
 
     public static Scalar lower = new Scalar(0, 160.1, 0);
-    public static Scalar blue_lower = new Scalar(0, 0, 174.3);
+    public static Scalar blue_lower = new Scalar(0, 0, 138.8);
     public static Scalar red_lower = new Scalar(0, 160.1, 0);
     public Scalar upper = new Scalar(255, 255, 255);
 

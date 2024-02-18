@@ -15,7 +15,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
 @TeleOp(name = "Camera Test", group = "linear opmode")
-public class i extends LinearOpMode {
+public class MecanumDrive2 extends LinearOpMode {
+
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private static int DESIRED_TAG_ID = 1;     // Choose the tag you want to approach or set to -1 for ANY tag.
     private VisionPortal visionPortal;               // Used to manage the video source.
@@ -168,9 +169,6 @@ public class i extends LinearOpMode {
             } else {
                 telemetry.addData(">","Drive using joysticks to find valid target\n");
             }
-
-
-
 
             double botHeading = -imu.getAngularOrientation().firstAngle;
             if (gamepad1.a) {

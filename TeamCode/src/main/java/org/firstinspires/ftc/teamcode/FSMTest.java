@@ -12,18 +12,22 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class FSMTest extends LinearOpMode{
 
-
-    public static String varName = "FSMTest";
-
-    public enum IntakeOuttakeStates{
+    public enum OuttakeStates{
         START,
-        INTAKING,
-        EXPEL,
         LIFT,
+        DEPOSIT_SETUP,
+        DESPOSIT,
         DROP
     }
+    public static String varName = "FSMTest";
 
-    IntakeOuttakeStates intakeStates = IntakeOuttakeStates.START;
+    public enum IntakeStates{
+        START,
+        INTAKING,
+        FINISH
+    }
+    OuttakeStates outtakeStates = OuttakeStates.START;
+    IntakeStates intakeStates = IntakeStates.START;
     DcMotor RFMotor;
     DcMotor RBMotor;
     DcMotor LFMotor;
@@ -61,13 +65,11 @@ public class FSMTest extends LinearOpMode{
         PullUp2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         PullUp1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         PullUp2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         double tracker = hardwareMap.voltageSensor.iterator().next().getVoltage();
         //Initialize servos to required position
-        outtakeFlip1.setPosition(0);
-        outtakeFlip2.setPosition(1);
+        outtakeFlip1.setPosition(1);
+        outtakeFlip2.setPosition(0);
         outtakeRelease.setPosition(0.4);
         LBMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         LFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -81,62 +83,93 @@ public class FSMTest extends LinearOpMode{
 
         while (opModeIsActive()) {
 
+            switch (outtakeStates) {
+                //START case is the inital case, where the outake hasn't sprung out
+                case START:
+                    if(!disableFlip) {
+                        System.out.println("not disabled.");
+                        outtakeFlip1.setPosition(0.35);
+                        outtakeFlip2.setPosition(0.65);
+                        outtakeRelease.setPosition(0.4);
+                    }
 
+
+                    if (gamepad2.x) {
+
+                        outtakeStates = OuttakeStates.LIFT;
+                        disableFlip = false;
+                    }
+                    break;
+
+                case LIFT:
+                    // at least run this using getEncoder() and check when you hit a particular position
+                    /*
+                    slides.setPower(0.6);
+                    sleep(liftTime);
+                    */
+
+                    if(gamepad2.x)
+                        outtakeStates = OuttakeStates.DEPOSIT_SETUP;
+                    if(gamepad2.y)
+                        outtakeStates = OuttakeStates.START;
+                //DEPOSIT_SETUP is second state where the outake gets ready to drop the pixel
+                case DEPOSIT_SETUP:
+                    if (!disableFlip) {
+                        outtakeFlip1.setPosition(0);
+                        outtakeFlip2.setPosition(1);
+                    }
+                    if (gamepad2.x) {
+                        outtakeStates = OuttakeStates.DESPOSIT;
+                    }
+                    if (gamepad2.y) {
+                        outtakeStates = OuttakeStates.START;
+                    }
+                    break;
+                //DROP is the final state where the pixel is dropped
+                case DESPOSIT:
+                    if (!disableFlip)
+                    outtakeRelease.setPosition(0);
+                    if (gamepad2.x) {
+                        outtakeStates = OuttakeStates.DROP;
+                    }
+                    if(gamepad2.y)
+                        outtakeStates = OuttakeStates.START;
+                    break;
+
+                case DROP:
+                    slides.setPower(-0.2);
+                    sleep(dropTime);
+                    if(gamepad2.x)
+                        outtakeStates = OuttakeStates.START;
+            }
             switch (intakeStates) {
                 case START:
-                    if(slides.getCurrentPosition() >= 50){
-                        slides.setPower(-0.2);
-                    }
-                    else
-                        slides.setPower(0.2);
-                    outtakeFlip1.setPosition(0);
-                    outtakeFlip2.setPosition(1);
-                    outtakeRelease.setPosition(0.29);
-                    IntakeMotor.setPower(0);
+                        IntakeMotor.setPower(0);
 
                     if (gamepad2.a) {
-                        intakeStates = IntakeOuttakeStates.INTAKING;
+                        intakeStates = IntakeStates.INTAKING;
                     }
                     break;
                 case INTAKING:
                     //Need to tune the current value
-                    IntakeMotor.setPower(0.9);
-                    if (gamepad2.left_trigger > 0.2) {
+                        IntakeMotor.setPower(0.9);
+                    if (gamepad2.dpad_right) {
 
-                        intakeStates = IntakeOuttakeStates.LIFT;
+                        intakeStates = IntakeStates.FINISH;
 
                     }
-                    if(gamepad2.right_trigger > 0.2)
-                        intakeStates = IntakeOuttakeStates.START;
-
-                    break;
-                case LIFT:
-                    IntakeMotor.setPower(0);
-                    outtakeFlip1.setPosition(0.65);
-                    outtakeFlip2.setPosition(0.35);
-                    if (slides.getCurrentPosition() <= 200){
-                        slides.setPower(0.6);
-                    }
-                    else
-                        slides.setPower(0.2);
-                    if(gamepad2.left_bumper)
-                        intakeStates = IntakeOuttakeStates.EXPEL;
-                    if(gamepad2.x){
-                        intakeStates = IntakeOuttakeStates.DROP;
-                    }
-                    if(gamepad2.y){
-                        intakeStates = IntakeOuttakeStates.START;
+                    if(gamepad2.b){
+                        intakeStates = IntakeStates.START;
                     }
                     break;
-                case DROP:
-                    outtakeRelease.setPosition(0);
-                    if(gamepad2.left_bumper)
-                        intakeStates = IntakeOuttakeStates.START;
+                case FINISH:
+                        IntakeMotor.setPower(0);
+
+                    if (gamepad2.dpad_left) {
+
+                        intakeStates = IntakeStates.START;
+                    }
                     break;
-                case EXPEL:
-                    IntakeMotor.setPower(-0.8);
-                    sleep(500);
-                    intakeStates = IntakeOuttakeStates.START;
             }
 
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
@@ -171,7 +204,7 @@ public class FSMTest extends LinearOpMode{
                 PullUp2.setTargetPosition(1000);
             }
 
-            /*if(gamepad2.dpad_up)
+            if(gamepad2.dpad_up)
             {
                //slides.setTargetPosition(slides.getCurrentPosition() + 50);
                 slides.setPower(1);
@@ -207,7 +240,7 @@ public class FSMTest extends LinearOpMode{
             else
             {
                 multiplier = 1;
-            }*/
+            }
 
             if(gamepad1.dpad_up)
                 outtakeRelease.setPosition(0);
