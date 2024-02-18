@@ -4,14 +4,27 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Blinker;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 //note -- we need to motion profile our slides, particularly given they're chunkier at the bottom than the top
 @TeleOp(name = "FSMTest", group = "Tests")
 @Config
 public class FSMTest extends LinearOpMode{
+
+    public int colorPicker(int r, int g, int b)
+    {
+        return r * 256 * 256 + g * 256 + b;
+    }
 
 
 
@@ -46,6 +59,9 @@ public class FSMTest extends LinearOpMode{
 
 
     boolean disableFlip = false;
+    private ElapsedTime runtime = new ElapsedTime();
+    private LynxModule cHub;
+    private Collection<Blinker.Step> steps;
 
 
 
@@ -53,6 +69,8 @@ public class FSMTest extends LinearOpMode{
     @Override
     public void runOpMode() throws InterruptedException {
         double multiplier = 1;
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+        steps = new ArrayList<Blinker.Step>();
         RFMotor = hardwareMap.dcMotor.get("RFMotor");
         RBMotor = hardwareMap.dcMotor.get("RBMotor");
         LFMotor = hardwareMap.dcMotor.get("LFMotor");
@@ -78,6 +96,7 @@ public class FSMTest extends LinearOpMode{
         outtakeRelease.setPosition(0.4);
         LBMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         LFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
 
         waitForStart();
@@ -154,6 +173,14 @@ public class FSMTest extends LinearOpMode{
                     IntakeMotor.setPower(-0.8);
                     sleep(500);
                     intakeStates = IntakeOuttakeStates.START;
+            }
+
+            if(gamepad1.left_stick_y > 0.5)
+            {
+
+                for (LynxModule hub : allHubs) {
+                    hub.setPattern(steps);
+                }
             }
 
 
