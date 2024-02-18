@@ -37,7 +37,8 @@ public class FSMTest extends LinearOpMode{
         INTAKING,
         EXPEL,
         LIFT,
-        DROP
+        DROP,
+        DROPSLIDES
     }
 
 
@@ -164,8 +165,13 @@ public class FSMTest extends LinearOpMode{
                     state = "Drop";
                     outtakeRelease.setPosition(0);
                     if(gamepad2.left_bumper)
-                        intakeStates = IntakeOuttakeStates.START;
+                        intakeStates = IntakeOuttakeStates.DROPSLIDES;
                     break;
+                case DROPSLIDES:
+                    if(Math.abs(slides.getCurrentPosition()) >= 10)
+                        slides.setPower(-0.4);
+                    else
+                        slides.setPower(-0.2);
                 case EXPEL:
                     state = "Expel";
                     IntakeMotor.setPower(-0.8);
