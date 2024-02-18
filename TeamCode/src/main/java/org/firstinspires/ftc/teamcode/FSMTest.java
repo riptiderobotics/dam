@@ -70,7 +70,6 @@ public class FSMTest extends LinearOpMode{
         PullUp1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         PullUp2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         double tracker = hardwareMap.voltageSensor.iterator().next().getVoltage();
         //Initialize servos to required position
@@ -96,14 +95,15 @@ public class FSMTest extends LinearOpMode{
 
             switch (intakeStates) {
                 case START:
-                    if(slides.getCurrentPosition() >= 50){
+                    if(slides.getCurrentPosition() >= 5){
                         slides.setPower(0.2);
                     }
                     else
                         slides.setPower(0);
-                    //outtakeFlip1.setPosition(0);
-                    //outtakeFlip2.setPosition(1);
-                    outtakeRelease.setPosition(0.29);
+                    outtakeFlip1.setPosition(1);
+                    outtakeFlip2.setPosition(0);
+                    telemetry.addData("Encoder Value Slides: ", slides.getCurrentPosition());
+                    outtakeRelease.setPosition(0.3);
 
                     IntakeMotor.setPower(0);
 
@@ -128,10 +128,11 @@ public class FSMTest extends LinearOpMode{
                     break;
                 case LIFT:
                     IntakeMotor.setPower(0);
-                    outtakeFlip1.setPosition(0.65);
-                    outtakeFlip2.setPosition(0.35);
-                    if (slides.getCurrentPosition() <= 100){
-                        slides.setPower(-0.6);
+                    outtakeFlip1.setPosition(0.35);
+                    outtakeFlip2.setPosition(0.65);
+                    if (slides.getCurrentPosition() <= 200){
+                        slides.setPower(-0.8);
+
                     }
                     else
                         slides.setPower(-0.2);
@@ -244,6 +245,9 @@ public class FSMTest extends LinearOpMode{
             LBMotor.setPower(backLeftPower * multiplier);
             RFMotor.setPower(frontRightPower * multiplier);
             RBMotor.setPower(backRightPower * multiplier);
+            telemetry.addData("Encoder Value Slides: ", slides.getCurrentPosition());
+            telemetry.update();
+
         }
     }
 }
