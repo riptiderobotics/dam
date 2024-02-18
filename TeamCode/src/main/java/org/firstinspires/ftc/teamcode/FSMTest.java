@@ -117,7 +117,10 @@ public class FSMTest extends LinearOpMode{
             switch (intakeStates) {
                 case START:
                     state = "Start";
-
+                    if(Math.abs(slides.getCurrentPosition()) >= 25)
+                        slides.setPower(-0.2);
+                    else
+                        slides.setPower(0);
                     outtakeFlip1.setPosition(1);
                     outtakeFlip2.setPosition(0);
                     telemetry.addData("Encoder Value Slides: ", slides.getCurrentPosition());
