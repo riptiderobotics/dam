@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.VisionPipelines.ActuallyContourPipeline;
@@ -12,8 +13,14 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "Official Auton")
-public class webcamTesting extends LinearOpMode {
+@Autonomous(name = "Manual Autonomous (Only use if RR isn't working)")
+public class manualAutonomous extends LinearOpMode {
+    DcMotor RFMotor;
+    DcMotor RBMotor;
+    DcMotor LFMotor;
+    DcMotor LBMotor;
+    DcMotorEx IntakeMotor;
+
 
 
     /*
@@ -32,10 +39,30 @@ public class webcamTesting extends LinearOpMode {
 
     int[] lastCentroid = {0, 0};
 
+    private void runForward(DcMotor rightFront, DcMotor leftFront, DcMotor rightBack, DcMotor leftBack)
+    {
+        rightFront.setPower(0.5);
+        leftFront.setPower(0.5);
+        rightBack.setPower(0.5);
+        leftBack.setPower(0.5);
+        sleep(3500);
+        rightFront.setPower(0);
+        leftFront.setPower(0);
+        rightBack.setPower(0);
+        leftBack.setPower(0);
+    }
 
     public void runOpMode() {
+        //Motor init
+        RFMotor = hardwareMap.dcMotor.get("RFMotor");
+        RBMotor = hardwareMap.dcMotor.get("RBMotor ");
+        LFMotor = hardwareMap.dcMotor.get("LFMotor");
+        LBMotor = hardwareMap.dcMotor.get("LBMotor");
+        IntakeMotor = hardwareMap.get(DcMotorEx.class, "Intake");
+        LBMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        LFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        while (!isStarted() && !isStopRequested()) {
+        // Camera Init
             // Acquire the camera ID
             WebcamName webcamname = hardwareMap.get(WebcamName.class, "Webcam 1");
 
@@ -56,46 +83,54 @@ public class webcamTesting extends LinearOpMode {
                     Webcam.startStreaming(640, 360, OpenCvCameraRotation.UPRIGHT);
                 }
 
-                @Override
-                public void onError(int errorCode) {
+                @Override public void onError(int errorCode) {
                     telemetry.addLine("Webcam not working");
+                }});
+
+        int[] centroid;
+        for (int x = 0; x < 1000; x++) {
+            centroid = ActuallyContourPipeline.getCentroid();
+            if (centroid[0] != 0 && centroid[1] != 0) {
+                lastCentroid = centroid;
+                telemetry.addData("x coord:", lastCentroid[0]);
+                telemetry.addData("Y coord", lastCentroid[1]);
+            }
+            if (lastCentroid[1] > 100) {
+                if (lastCentroid[0] < 200) {
+                    // do something
+                    autonMode = 1;
+
+                } else if (lastCentroid[0] > 200) {
+                    // do something else
+                    autonMode = 2;
+
                 }
-            });
 
-
-
-            break;
+                telemetry.addData("Detected", autonMode);
+                telemetry.update();
+                break;
+            }
         }
 
         waitForStart();
 
         while(opModeIsActive())
         {
-            int[] centroid;
-            for (int x = 0; x < 1000; x++) {
-                centroid = ActuallyContourPipeline.getCentroid();
-                if (centroid[0] != 0 && centroid[1] != 0) {
-                    lastCentroid = centroid;
-                    telemetry.addData("x coord:", lastCentroid[0]);
-                    telemetry.addData("Y coord", lastCentroid[1]);
-                }
-                if (lastCentroid[1] > 100) {
-                    if (lastCentroid[0] < 200) {
-                        // do something
-                        autonMode = 1;
+                //3500 @ 0.5
+            runForward(RFMotor,LFMotor,RBMotor,LBMotor);
 
-                    } else if (lastCentroid[0] > 200) {
-                        // do something else
-                        autonMode = 2;
-
-                    }
-
-                }
-                telemetry.addData("Mode", autonMode);
-                telemetry.update();
-
+            if (autonMode == 1)
+            {
+                k
+            } else if( autonMode == 3) {
 
             }
+
+            IntakeMotor.setPower(0.5);
+            sleep(1);
+            IntakeMotor.setPower(0);
+
+
         }
     }
 }

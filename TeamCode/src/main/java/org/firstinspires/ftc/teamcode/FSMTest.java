@@ -109,7 +109,7 @@ public class FSMTest extends LinearOpMode{
        slides.setPower(1);
        */
 
-
+        // For slides, negative power is positive, and viceversa.
         while (opModeIsActive()) {
 
 
@@ -118,7 +118,7 @@ public class FSMTest extends LinearOpMode{
             switch (intakeStates) {
                 case START:
                     state = "Start";
-
+                    // Start state
                     outtakeFlip1.setPosition(1);
                     outtakeFlip2.setPosition(0);
                     telemetry.addData("Encoder Value Slides: ", slides.getCurrentPosition());
@@ -129,6 +129,7 @@ public class FSMTest extends LinearOpMode{
                     if (gamepad2.a) {
                         intakeStates = IntakeOuttakeStates.INTAKING;
                     }
+
                     break;
                 case INTAKING:
                     state = "Intaking";
@@ -136,15 +137,12 @@ public class FSMTest extends LinearOpMode{
                     //Need to tune the current value
                     IntakeMotor.setPower(0.9);
                     if (gamepad2.left_trigger > 0.2) {
-
-
                         intakeStates = IntakeOuttakeStates.LIFT;
 //hey
                     }
-                    if(gamepad2.right_trigger > 0.2)
-                        intakeStates = IntakeOuttakeStates.START;
-
-
+                    if(gamepad2.y) {
+                        intakeStates = IntakeOuttakeStates.EXPEL;
+                    }
                     break;
                 case LIFT:
                     state = "Lift";
@@ -152,8 +150,7 @@ public class FSMTest extends LinearOpMode{
                     outtakeFlip1.setPosition(0.35);
                     outtakeFlip2.setPosition(0.65);
 
-                    if(gamepad2.left_bumper)
-                        intakeStates = IntakeOuttakeStates.EXPEL;
+
                     if(gamepad2.x){
                         intakeStates = IntakeOuttakeStates.DROP;
                     }
@@ -168,10 +165,12 @@ public class FSMTest extends LinearOpMode{
                         intakeStates = IntakeOuttakeStates.DROPSLIDES;
                     break;
                 case DROPSLIDES:
-                    if(Math.abs(slides.getCurrentPosition()) >= 10)
+                    if(Math.abs(slides.getCurrentPosition()) >= 10) {
                         slides.setPower(-0.4);
-                    else
+                    }
+                    else {
                         slides.setPower(-0.2);
+                    }
                 case EXPEL:
                     state = "Expel";
                     IntakeMotor.setPower(-0.8);
