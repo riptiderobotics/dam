@@ -4,14 +4,27 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Blinker;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 //note -- we need to motion profile our slides, particularly given they're chunkier at the bottom than the top
 @TeleOp(name = "FSMTest", group = "Tests")
 @Config
 public class FSMTest extends LinearOpMode{
+
+    public int colorPicker(int r, int g, int b)
+    {
+        return r * 256 * 256 + g * 256 + b;
+    }
 
 
 
@@ -46,6 +59,10 @@ public class FSMTest extends LinearOpMode{
 
 
     boolean disableFlip = false;
+    private ElapsedTime runtime = new ElapsedTime();
+    private LynxModule cHub;
+    private Collection<Blinker.Step> steps;
+    String state = "None";
 
 
 
@@ -53,6 +70,8 @@ public class FSMTest extends LinearOpMode{
     @Override
     public void runOpMode() throws InterruptedException {
         double multiplier = 1;
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+        steps = new ArrayList<Blinker.Step>();
         RFMotor = hardwareMap.dcMotor.get("RFMotor");
         RBMotor = hardwareMap.dcMotor.get("RBMotor");
         LFMotor = hardwareMap.dcMotor.get("LFMotor");
@@ -70,6 +89,7 @@ public class FSMTest extends LinearOpMode{
         PullUp1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         PullUp2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         double tracker = hardwareMap.voltageSensor.iterator().next().getVoltage();
         //Initialize servos to required position
@@ -78,6 +98,7 @@ public class FSMTest extends LinearOpMode{
         outtakeRelease.setPosition(0.4);
         LBMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         LFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
 
         waitForStart();
@@ -95,7 +116,8 @@ public class FSMTest extends LinearOpMode{
 
             switch (intakeStates) {
                 case START:
-                    if(slides.getCurrentPosition() >= 5){
+                    state = "Start";
+                    if(slides.getCurrentPosition() >= 10){
                         slides.setPower(0.2);
                     }
                     else
@@ -103,8 +125,7 @@ public class FSMTest extends LinearOpMode{
                     outtakeFlip1.setPosition(1);
                     outtakeFlip2.setPosition(0);
                     telemetry.addData("Encoder Value Slides: ", slides.getCurrentPosition());
-                    outtakeRelease.setPosition(0.3);
-
+                    outtakeRelease.setPosition(0.29);
                     IntakeMotor.setPower(0);
 
 
@@ -113,6 +134,8 @@ public class FSMTest extends LinearOpMode{
                     }
                     break;
                 case INTAKING:
+                    state = "Intaking";
+
                     //Need to tune the current value
                     IntakeMotor.setPower(0.9);
                     if (gamepad2.left_trigger > 0.2) {
@@ -127,11 +150,13 @@ public class FSMTest extends LinearOpMode{
 
                     break;
                 case LIFT:
+                    state = "Lift";
                     IntakeMotor.setPower(0);
                     outtakeFlip1.setPosition(0.35);
                     outtakeFlip2.setPosition(0.65);
-                    if (slides.getCurrentPosition() <= 200){
-                        slides.setPower(-0.8);
+                    if (Math.abs(slides.getCurrentPosition()) <= 500){
+                        telemetry.addData("this is added", "to test whether this is called");
+                        slides.setPower(-0.7);
 
                     }
                     else
@@ -146,14 +171,24 @@ public class FSMTest extends LinearOpMode{
                     }
                     break;
                 case DROP:
+                    state = "Drop";
                     outtakeRelease.setPosition(0);
                     if(gamepad2.left_bumper)
                         intakeStates = IntakeOuttakeStates.START;
                     break;
                 case EXPEL:
+                    state = "Expel";
                     IntakeMotor.setPower(-0.8);
                     sleep(500);
                     intakeStates = IntakeOuttakeStates.START;
+            }
+
+            if(gamepad1.left_stick_y > 0.5)
+            {
+
+                for (LynxModule hub : allHubs) {
+                    hub.setPattern(steps);
+                }
             }
 
 
@@ -178,7 +213,6 @@ public class FSMTest extends LinearOpMode{
 
 
 
-            telemetry.update();
             if(gamepad1.square)
             {
                 PullUp1.setTargetPosition(-2130);
@@ -246,6 +280,7 @@ public class FSMTest extends LinearOpMode{
             RFMotor.setPower(frontRightPower * multiplier);
             RBMotor.setPower(backRightPower * multiplier);
             telemetry.addData("Encoder Value Slides: ", slides.getCurrentPosition());
+            telemetry.addData("Robot state:", state);
             telemetry.update();
 
         }
