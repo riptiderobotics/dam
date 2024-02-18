@@ -117,11 +117,7 @@ public class FSMTest extends LinearOpMode{
             switch (intakeStates) {
                 case START:
                     state = "Start";
-                    if(slides.getCurrentPosition() >= 10){
-                        slides.setPower(0.2);
-                    }
-                    else
-                        slides.setPower(0);
+
                     outtakeFlip1.setPosition(1);
                     outtakeFlip2.setPosition(0);
                     telemetry.addData("Encoder Value Slides: ", slides.getCurrentPosition());
@@ -154,13 +150,7 @@ public class FSMTest extends LinearOpMode{
                     IntakeMotor.setPower(0);
                     outtakeFlip1.setPosition(0.35);
                     outtakeFlip2.setPosition(0.65);
-                    if (Math.abs(slides.getCurrentPosition()) <= 500){
-                        telemetry.addData("this is added", "to test whether this is called");
-                        slides.setPower(-0.7);
 
-                    }
-                    else
-                        slides.setPower(-0.2);
                     if(gamepad2.left_bumper)
                         intakeStates = IntakeOuttakeStates.EXPEL;
                     if(gamepad2.x){
@@ -268,6 +258,18 @@ public class FSMTest extends LinearOpMode{
                multiplier = 1;
            }*/
 
+            if(gamepad2.dpad_up)
+            {
+                //slides.setTargetPosition(slides.getCurrentPosition() + 50);
+                slides.setPower(1);
+            }
+            else if(gamepad2.dpad_down)
+            {
+                slides.setPower(-0.2);
+            }
+            else {
+                slides.setPower(0.2);
+            }
 
             if(gamepad1.dpad_up)
                 outtakeRelease.setPosition(0);
