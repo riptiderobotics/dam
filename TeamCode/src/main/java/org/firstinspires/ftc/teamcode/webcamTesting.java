@@ -12,15 +12,19 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-@Autonomous(name = "webcam testing!")
+@Autonomous(name = "Official Auton")
 public class webcamTesting extends LinearOpMode {
-    DcMotor RBMotor = hardwareMap.dcMotor.get("RBMotor");
-    DcMotor LFMotor = hardwareMap.dcMotor.get("LFMotor");
-    DcMotor LBMotor = hardwareMap.dcMotor.get("LBMotor");
-
-    DcMotorEx RFMotor = hardwareMap.get(DcMotorEx.class, "RFMotor");
 
 
+    /*
+        Autonomous modes:
+        1 = right
+        2 = centere
+        3 = left
+        automatically set to left b/c we only check for right and center and use process of elim to deduce left.
+     */
+
+    int autonMode = 3;
 
     // why does Android studio have a spell checker
     // webcamdude is the webcam. I'm not naming it anything else
@@ -33,7 +37,7 @@ public class webcamTesting extends LinearOpMode {
 
         while (!isStarted() && !isStopRequested()) {
             // Acquire the camera ID
-            WebcamName webcamname = hardwareMap.get(WebcamName.class, "Webcam");
+            WebcamName webcamname = hardwareMap.get(WebcamName.class, "Webcam 1");
 
             int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             //set the cam name and id to the webcam.
@@ -57,46 +61,36 @@ public class webcamTesting extends LinearOpMode {
                     telemetry.addLine("Webcam not working");
                 }
             });
+
+            break;
         }
 
-            while(opModeIsActive())
-            {
+        waitForStart();
+
+        while(opModeIsActive())
+        {
             int[] centroid;
-            for (int x = 0; x < 100; x++) {
+            for (int x = 0; x < 1000; x++) {
                 centroid = ActuallyContourPipeline.getCentroid();
                 if (centroid[0] != 0 && centroid[1] != 0) {
                     lastCentroid = centroid;
+                    telemetry.addData("x coord:", lastCentroid[0]);
+                    telemetry.addData("Y coord", lastCentroid[1]);
                 }
+                if (lastCentroid[1] > 100) {
+                    if (lastCentroid[0] < 200) {
+                        // do something
+                        autonMode = 1;
 
-                if (lastCentroid[0] < 100) {
-                    // do something
-                    LBMotor.setPower(0.25);
-                    RFMotor.setPower(0.25);
-                    RBMotor.setPower(0.25);
-                    LFMotor.setPower(0.25);
-                    sleep(10000);
+                    } else if (lastCentroid[0] > 200) {
+                        // do something else
+                        autonMode = 2;
 
-                } else if (lastCentroid[0] < 300) {
-                    // do something else
-                    LBMotor.setPower(0.25);
-                    RFMotor.setPower(0.25);
-                    RBMotor.setPower(0.25);
-                    LFMotor.setPower(0.25);
-                    sleep(5000);
+                    }
 
-                } else {
-                    // do another thing
-                    LBMotor.setPower(0.25);
-                    RFMotor.setPower(0.25);
-                    RBMotor.setPower(0.25);
-                    LFMotor.setPower(0.25);
-                    sleep(7000);
                 }
-                LBMotor.setPower(0);
-                RFMotor.setPower(0);
-                RBMotor.setPower(0);
-                LFMotor.setPower(0);
-                sleep(300000);
+                telemetry.addData("Mode", autonMode);
+                telemetry.update();
             }
         }
     }
