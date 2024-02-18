@@ -122,17 +122,7 @@ public class ActuallyContourPipeline extends OpenCvPipeline {
         }
 
 
-        if (onlyContours == 1)
-        {
-            activeMat = maskedInputMat;
-        }
-        else if (onlyContours == 2)
-        {
-            activeMat = emptyMat;
-        }
-        else {
-            activeMat = input;
-        }
+        activeMat = maskedInputMat;
         largestArea = 0;
         largestX = 0;
         largestY = 0;
@@ -179,6 +169,8 @@ public class ActuallyContourPipeline extends OpenCvPipeline {
     }
 
     public static int[] getCentroid() { return new int[] {currentX, currentY};}
+
+    public static int getCurrentX() { return currentX; }
 
     public static double setTeamFilter(int team)
     {
