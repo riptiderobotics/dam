@@ -74,8 +74,8 @@ public class FSMTest extends LinearOpMode{
         //slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         double tracker = hardwareMap.voltageSensor.iterator().next().getVoltage();
         //Initialize servos to required position
-        outtakeFlip1.setPosition(0);
-        outtakeFlip2.setPosition(1);
+        outtakeFlip1.setPosition(1);
+        outtakeFlip2.setPosition(0);
         outtakeRelease.setPosition(0.4);
         LBMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         LFMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -97,13 +97,14 @@ public class FSMTest extends LinearOpMode{
             switch (intakeStates) {
                 case START:
                     if(slides.getCurrentPosition() >= 50){
-                        slides.setPower(-0.2);
+                        slides.setPower(0.2);
                     }
                     else
-                        slides.setPower(0.2);
-                    outtakeFlip1.setPosition(0);
-                    outtakeFlip2.setPosition(1);
+                        slides.setPower(0);
+                    //outtakeFlip1.setPosition(0);
+                    //outtakeFlip2.setPosition(1);
                     outtakeRelease.setPosition(0.29);
+
                     IntakeMotor.setPower(0);
 
 
@@ -129,11 +130,11 @@ public class FSMTest extends LinearOpMode{
                     IntakeMotor.setPower(0);
                     outtakeFlip1.setPosition(0.65);
                     outtakeFlip2.setPosition(0.35);
-                    if (slides.getCurrentPosition() <= 200){
-                        slides.setPower(0.6);
+                    if (slides.getCurrentPosition() <= 100){
+                        slides.setPower(-0.6);
                     }
                     else
-                        slides.setPower(0.2);
+                        slides.setPower(-0.2);
                     if(gamepad2.left_bumper)
                         intakeStates = IntakeOuttakeStates.EXPEL;
                     if(gamepad2.x){
