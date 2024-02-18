@@ -172,6 +172,8 @@ public class FSMTest extends LinearOpMode{
                         slides.setPower(-0.4);
                     else
                         slides.setPower(-0.2);
+                    if(gamepad2.b)
+                        intakeStates = IntakeOuttakeStates.START;
                 case EXPEL:
                     state = "Expel";
                     IntakeMotor.setPower(-0.8);
