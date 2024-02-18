@@ -48,14 +48,13 @@ public class OdometryTesting extends LinearOpMode {
         if (isStopRequested()) return;
         while (opModeIsActive()) {
             // run autonomous
-
             // update positions
             odometry.updatePose();
             robotPose = odometry.getPose();
+
             telemetry.addData("Robot Location X:", robotPose.getX());
             telemetry.addData("Robot Location Y:", robotPose.getY());
             telemetry.addData("Robot Heading:", robotPose.getHeading());
-            telemetry.addData("Hey", "Test");
             telemetry.update();
         }
     }
