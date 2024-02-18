@@ -63,6 +63,8 @@ public class FSMTest extends LinearOpMode{
     private ElapsedTime runtime = new ElapsedTime();
     private LynxModule cHub;
     private Collection<Blinker.Step> steps;
+
+    boolean shortcutEnabled = false;
     String state = "None";
 
 
