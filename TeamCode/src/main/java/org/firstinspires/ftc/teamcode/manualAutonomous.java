@@ -119,12 +119,12 @@ public class manualAutonomous extends LinearOpMode {
                 //3500 @ 0.5
             runForward(RFMotor,LFMotor,RBMotor,LBMotor);
 
-            if (autonMode == 1)
+            /*if (autonMode == 1)
             {
-                k
+
             } else if( autonMode == 3) {
 
-            }
+            }*/
 
             IntakeMotor.setPower(0.5);
             sleep(1);
