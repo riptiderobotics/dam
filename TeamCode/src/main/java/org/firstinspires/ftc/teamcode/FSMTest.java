@@ -32,17 +32,14 @@ public class FSMTest extends LinearOpMode{
     public static String varName = "FSMTest";
 
 
-    public enum IntakeOuttakeStates{
+    public enum robotOuttakeStates{
         START,
-        INTAKING,
-        EXPEL,
-        LIFT,
-        DROP,
-        DROPSLIDES
+        FLIP,
+        DROP
     }
 
 
-    IntakeOuttakeStates intakeStates = IntakeOuttakeStates.START;
+    robotOuttakeStates outtakeStates = robotOuttakeStates.START;
     DcMotor RFMotor;
     DcMotor RBMotor;
     DcMotor LFMotor;
@@ -115,67 +112,32 @@ public class FSMTest extends LinearOpMode{
 
 
 
-            switch (intakeStates) {
+            switch (outtakeStates) {
                 case START:
-                    state = "Start";
-                    // Start state
                     outtakeFlip1.setPosition(1);
                     outtakeFlip2.setPosition(0);
-                    telemetry.addData("Encoder Value Slides: ", slides.getCurrentPosition());
                     outtakeRelease.setPosition(0.29);
-                    IntakeMotor.setPower(0);
-
-
-                    if (gamepad2.a) {
-                        intakeStates = IntakeOuttakeStates.INTAKING;
-                    }
-
-                    break;
-                case INTAKING:
-                    state = "Intaking";
-
-                    //Need to tune the current value
-                    IntakeMotor.setPower(0.9);
-                    if (gamepad2.left_trigger > 0.2) {
-                        intakeStates = IntakeOuttakeStates.LIFT;
-//hey
-                    }
-                    if(gamepad2.y) {
-                        intakeStates = IntakeOuttakeStates.EXPEL;
+                    if(gamepad2.x){
+                        outtakeStates = robotOuttakeStates.FLIP;
                     }
                     break;
-                case LIFT:
-                    state = "Lift";
-                    IntakeMotor.setPower(0);
+                case FLIP:
                     outtakeFlip1.setPosition(0.35);
                     outtakeFlip2.setPosition(0.65);
-
-
-                    if(gamepad2.x){
-                        intakeStates = IntakeOuttakeStates.DROP;
-                    }
                     if(gamepad2.y){
-                        intakeStates = IntakeOuttakeStates.START;
+                        outtakeStates = robotOuttakeStates.DROP;
+                    }
+                    if(gamepad2.start){
+                        outtakeStates = robotOuttakeStates.START;
                     }
                     break;
                 case DROP:
-                    state = "Drop";
                     outtakeRelease.setPosition(0);
-                    if(gamepad2.left_bumper)
-                        intakeStates = IntakeOuttakeStates.DROPSLIDES;
+                    if(gamepad2.start){
+                        outtakeStates = robotOuttakeStates.START;
+                    }
                     break;
-                case DROPSLIDES:
-                    if(Math.abs(slides.getCurrentPosition()) >= 10) {
-                        slides.setPower(-0.4);
-                    }
-                    else {
-                        slides.setPower(-0.2);
-                    }
-                case EXPEL:
-                    state = "Expel";
-                    IntakeMotor.setPower(-0.8);
-                    sleep(500);
-                    intakeStates = IntakeOuttakeStates.START;
+
             }
 
             if(gamepad1.left_stick_y > 0.5)
@@ -208,7 +170,7 @@ public class FSMTest extends LinearOpMode{
 
 
 
-            if(gamepad1.square)
+            if(gamepad1.dpad_up)
             {
                 PullUp1.setTargetPosition(-2130);
                 PullUp2.setTargetPosition(2130);
@@ -217,10 +179,32 @@ public class FSMTest extends LinearOpMode{
                 PullUp2.setPower(0.7);
                 PullUp1.setPower(0.7);
             }
-            if(gamepad1.circle)
+            if(gamepad1.dpad_down)
             {
                 PullUp1.setTargetPosition(-1000);
                 PullUp2.setTargetPosition(1000);
+                PullUp2.setPower(-0.5);
+                PullUp1.setPower(-0.5);
+            }
+            if(gamepad1.ps)
+            {
+                PullUp1.setTargetPosition(0);
+                PullUp2.setTargetPosition(0);
+                PullUp2.setPower(-0.5);
+                PullUp1.setPower(-0.5);
+            }
+
+            if(gamepad2.a){
+                IntakeMotor.setPower(0.9);
+            }
+            else{
+                IntakeMotor.setPower(0);
+            }
+            if(gamepad2.b){
+                IntakeMotor.setPower(-0.9);
+            }
+            else{
+                IntakeMotor.setPower(0);
             }
 
 
@@ -276,12 +260,10 @@ public class FSMTest extends LinearOpMode{
                 slides.setPower(0.2);
             }
 
-            if(gamepad1.dpad_up)
-                outtakeRelease.setPosition(0);
-            if(gamepad1.dpad_down)
-                outtakeRelease.setPosition(0.4);
-            if(gamepad1.dpad_left)
+
+            if(gamepad1.cross)
                 droneLauncher.setPosition(0.72);
+
             LFMotor.setPower(frontLeftPower * multiplier);
             LBMotor.setPower(backLeftPower * multiplier);
             RFMotor.setPower(frontRightPower * multiplier);
