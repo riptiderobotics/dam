@@ -44,7 +44,7 @@ public class FSMTest extends LinearOpMode{
     DcMotor RBMotor;
     DcMotor LFMotor;
     DcMotor LBMotor;
-    DcMotorEx IntakeMotor;
+    DcMotor IntakeMotor;
     DcMotor slides;
     DcMotor PullUp1;
     DcMotor PullUp2;
@@ -73,7 +73,7 @@ public class FSMTest extends LinearOpMode{
         RBMotor = hardwareMap.dcMotor.get("RBMotor");
         LFMotor = hardwareMap.dcMotor.get("LFMotor");
         LBMotor = hardwareMap.dcMotor.get("LBMotor");
-        IntakeMotor = hardwareMap.get(DcMotorEx.class, "Intake");
+        IntakeMotor = hardwareMap.dcMotor.get("Intake");
         slides = hardwareMap.dcMotor.get("Spool");
         PullUp1 = hardwareMap.dcMotor.get("PullUpLeft");
         PullUp2 = hardwareMap.dcMotor.get("PullUpRight");
@@ -185,8 +185,7 @@ public class FSMTest extends LinearOpMode{
                 PullUp2.setPower(-0.5);
                 PullUp1.setPower(-0.5);
             }
-            if(gamepad1.ps)
-            {
+            if(gamepad1.ps) {
                 PullUp1.setTargetPosition(0);
                 PullUp2.setTargetPosition(0);
                 PullUp2.setPower(-0.5);
@@ -196,55 +195,16 @@ public class FSMTest extends LinearOpMode{
             if(gamepad2.a){
                 IntakeMotor.setPower(0.9);
             }
-            else{
-                IntakeMotor.setPower(0);
-            }
+
+
             if(gamepad2.b){
-                IntakeMotor.setPower(-0.9);
-            }
-            else{
                 IntakeMotor.setPower(0);
             }
 
 
-           /*if(gamepad2.dpad_up)
-           {
-              //slides.setTargetPosition(slides.getCurrentPosition() + 50);
-               slides.setPower(1);
-           }
-           else if(gamepad2.dpad_down)
-           {
-               slides.setPower(-0.2);
-           }
-           else {
-               slides.setPower(0.2);
-           }
-           if(gamepad2.left_trigger > 0.35)
-           {
-               disableFlip = true;
-               outtakeFlip1.setPosition(0.35);
-               outtakeFlip2.setPosition(0.65);
-           }
-           else if (gamepad2.right_trigger > 0.35)
-           {
-               disableFlip = true;
-               outtakeFlip1.setPosition(1);
-               outtakeFlip2.setPosition(0);
-           }
 
 
-           if(gamepad1.triangle)
-           {
-               multiplier = 0.5;
-           }
-           else if(gamepad1.cross)
-           {
-               multiplier = 0.25;
-           }
-           else
-           {
-               multiplier = 1;
-           }*/
+
 
             if(gamepad2.dpad_up)
             {
@@ -269,6 +229,7 @@ public class FSMTest extends LinearOpMode{
             RBMotor.setPower(backRightPower * multiplier);
             telemetry.addData("Encoder Value Slides: ", slides.getCurrentPosition());
             telemetry.addData("Robot state:", state);
+            telemetry.addData("Intake Power: ", IntakeMotor.getPower());
             telemetry.update();
 
         }

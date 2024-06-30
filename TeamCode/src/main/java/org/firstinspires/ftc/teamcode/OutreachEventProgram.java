@@ -180,13 +180,13 @@ public class OutreachEventProgram extends LinearOpMode{
                 pullUpLeft.setPower(-0.5);
             }
 
-            if(gamepad2.a){
+            if(gamepad2.cross){
                 intake.setPower(0.9);
             }
             else{
                 intake.setPower(0);
             }
-            if(gamepad2.b){
+            if(gamepad2.circle){
                 intake.setPower(-0.9);
             }
             else{
