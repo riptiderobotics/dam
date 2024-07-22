@@ -82,7 +82,7 @@ public class ManualFeedforwardTuner extends LinearOpMode {
 
         telemetry.addLine("Ready!");
         telemetry.update();
-        telemetry.clearAll();
+        //telemetry.clearAll();
 
         waitForStart();
 
